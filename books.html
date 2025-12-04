@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books by Faique</title>
+    <link rel="stylesheet" href="book.css">
+   
+</head>
+
+<body>
+
+
+    <div class="container">
+        <div class="header">
+            <img src="aset/book.jpeg">
+            <h1> JS webcodecamp <span> book</span>List</h1>
+        </div>
+        <div class="box">
+            <label>Title</label>
+            <input type="text" placeholder="Title">
+
+            <label>Author</label>
+            <input type="text" placeholder="Author">
+
+            <label>Year</label>
+            <input type="number" placeholder="Year">
+
+            <button class="btn">Add Book</button>
+        </div>
+
+        <table>
+            <thead>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Year</th>
+                <th>Action</th>
+            </thead>
+            <tbody id="bookList">
+            </tbody>
+        </table>
+
+    </div>
+    <script>
+        const btn = document.querySelector(".btn");
+        const inputs = document.querySelectorAll("input");
+        const bookList = document.getElementById("bookList");
+
+        let books = JSON.parse(localStorage.getItem("books")) || [];
+        let editIndex = null;
+
+   
+        function renderBooks() {
+            bookList.innerHTML = "";
+            books.forEach((b, i) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+            <td>${b.title}</td>
+            <td>${b.author}</td>
+            <td>${b.year}</td>
+            <td>
+                <div id="buttons">
+                <button class="edit-btn" onclick="editBook(${i})">Edit</button>
+                <button class="sc-btn" onclick="deleteBook(${i})">Delete</button>
+                </div>
+            </td>
+        `;
+                bookList.appendChild(row);
+            });
+            localStorage.setItem("books", JSON.stringify(books));
+        }
+
+        // Add or update book
+        btn.onclick = function () {
+            const title = inputs[0].value.trim();
+            const author = inputs[1].value.trim();
+            const year = inputs[2].value.trim();
+
+            if (!title || !author || !year) return alert("Fill all fields!");
+
+            if (editIndex !== null) {
+                books[editIndex] = { title, author, year };
+                editIndex = null;
+                btn.textContent = "Add Book";
+            } else {
+                books.push({ title, author, year });
+            }
+
+            renderBooks();
+            inputs.forEach(i => i.value = "");
+        }
+
+        
+        function deleteBook(i) {
+            if (confirm("Are you sure?")) {
+                books.splice(i, 1);
+                renderBooks();
+            }
+        }
+
+       
+        function editBook(i) {
+            const b = books[i];
+            inputs[0].value = b.title;
+            inputs[1].value = b.author;
+            inputs[2].value = b.year;
+            btn.textContent = "Update Book";
+            editIndex = i;
+        }
+
+        
+        renderBooks();
+    </script>
+
+
+</body>
+
+</html>
